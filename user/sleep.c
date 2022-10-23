@@ -6,6 +6,7 @@ int
 main(int argc, char *argv[]) {
   if (argc <= 1) {
     fprintf(2, "sleep: params error\n");
+    exit(1);
   }
 
   int seconds = atoi(argv[1]);
