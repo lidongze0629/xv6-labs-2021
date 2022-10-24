@@ -52,6 +52,24 @@ strchr(const char *s, char c)
   return 0;
 }
 
+// refer: https://opensource.apple.com/source/xnu/xnu-517.7.7/libsa/strrchr.c.auto.html
+char*
+strrchr(const char *s, char c)
+{
+  char *save;
+  char ch;
+
+  for (save = (char *)0; (ch = *s); s++) {
+    if (c == ch) {
+      save = (char *) s;
+    }
+  }
+
+  return save;
+}
+
+
+
 char*
 gets(char *buf, int max)
 {
