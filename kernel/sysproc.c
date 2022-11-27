@@ -77,11 +77,44 @@ sys_sleep(void)
 
 
 #ifdef LAB_PGTBL
+#define MAX_PG_ACCESS_NUM 512
+#ifndef CHAR_BITS_NUM
+#define CHAR_BITS_NUM 8
+#endif
 int
 sys_pgaccess(void)
 {
-  // lab pgtbl: your code here.
-  return 0;
+  uint64 va;   // virtual address of the first user page to check
+  int npages;     // number of pages to check
+  uint64 buf;  // a user address to a buffer to store the results into a bitmask
+
+  if (argaddr(0, &va) < 0 ||
+      argint(1, &npages) < 0 ||
+      argaddr(2, &buf) < 0 ||
+      npages < 0 ||
+      npages > MAX_PG_ACCESS_NUM) {
+    return -1;
+  }
+
+  // init temp rlt buf
+  int npages_roundup = (npages + CHAR_BITS_NUM -1) & ~(CHAR_BITS_NUM -1);
+  char temp[npages_roundup / CHAR_BITS_NUM];
+  memset(temp, 0, sizeof(temp));
+
+  // walk
+  pagetable_t pagetable = myproc()->pagetable;
+  pte_t *pte;
+  for (int i = 0; i < npages; va += PGSIZE, i++) {
+    pte = walk(pagetable, va, 0);
+    if (pte == 0)
+      continue;
+    if (*pte & PTE_A) {
+      temp[i / CHAR_BITS_NUM] |= (1 << (i % CHAR_BITS_NUM));
+    }
+    *pte &= ~PTE_A;
+  }
+
+  return copyout(pagetable, buf, temp, sizeof(temp));
 }
 #endif
 
