@@ -281,6 +281,40 @@ freewalk(pagetable_t pagetable)
   kfree((void*)pagetable);
 }
 
+#ifdef LAB_PGTBL
+// visualize RISC-V page tables
+void
+vmprint(pagetable_t pagetable)
+{
+  pagetable_t s_pagetable;  // second level pagetable
+  pagetable_t t_pagetable;  // third level pagetable
+  printf("page table %p\n", pagetable);
+  // there are 2^9 = 512 PTEs in a page table.
+  for (int i = 0; i < 512; i++) {
+    pte_t pte = pagetable[i];
+    if ((pte & PTE_V)) {
+      printf("..%d: pte %p pa %p\n", i, pte, PTE2PA(pte));
+      // second level pagetable
+      s_pagetable = (pagetable_t)PTE2PA(pte);
+      for (int j = 0; j < 512; j++) {
+        pte = s_pagetable[j];
+        if ((pte & PTE_V)) {
+          printf(".. ..%d: pte %p pa %p\n", j, pte, PTE2PA(pte));
+          // third level pagetable
+          t_pagetable = (pagetable_t)PTE2PA(pte);
+          for (int k = 0; k < 512; k++) {
+            pte = t_pagetable[k];
+            if ((pte & PTE_V)) {
+              printf(".. .. ..%d: pte %p pa %p\n", k, pte, PTE2PA(pte));
+            }
+          } // third level
+        }
+      } // second level
+    }
+  } // first level
+}
+#endif
+
 // Free user memory pages,
 // then free page-table pages.
 void

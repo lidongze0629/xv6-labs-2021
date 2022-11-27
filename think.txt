@@ -1,0 +1,25 @@
+page table 0x0000000087f6e000
+ ..0: pte 0x0000000021fda801 pa 0x0000000087f6a000
+ .. ..0: pte 0x0000000021fda401 pa 0x0000000087f69000
+ .. .. ..0: pte 0x0000000021fdac1f pa 0x0000000087f6b000
+ .. .. ..1: pte 0x0000000021fda00f pa 0x0000000087f68000
+ .. .. ..2: pte 0x0000000021fd9c1f pa 0x0000000087f67000
+ ..255: pte 0x0000000021fdb401 pa 0x0000000087f6d000
+ .. ..511: pte 0x0000000021fdb001 pa 0x0000000087f6c000
+ .. .. ..509: pte 0x0000000021fdd813 pa 0x0000000087f76000
+ .. .. ..510: pte 0x0000000021fddc07 pa 0x0000000087f77000
+ .. .. ..511: pte 0x0000000020001c0b pa 0x0000000080007000
+
+Explain the output of vmprint in terms of Fig 3-4 from the text. What does page 0 contain? What is in page 2? When running in user mode, could the process read/write the memory mapped by page 1? What does the third to last page contain?
+
+Q: What does page 0 contain?
+A: line52(57) in kernel/exec.c, page 0 contain the ELF segment of user/init.c
+
+Q: What is in page 2?
+A: Stack for user process, line 71 in kernel/exec.c
+
+Q: When running in user mode, could the process read/write the memory mapped by page 1?
+A: line 74 in kernel/exec.c, set the page with PTE_U = 0, can't read page 1 in user mode.
+
+Q: What does the third to last page contain?
+A: ....
